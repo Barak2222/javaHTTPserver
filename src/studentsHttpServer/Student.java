@@ -2,7 +2,6 @@ package studentsHttpServer;
 
 public class Student {
 	static final String DEF = "DEFAULT_VALUE";
-
 	private int id;
 	private String name;
 	private String gender;
@@ -15,7 +14,6 @@ public class Student {
 		this.grade = -1;
 	}
 	
-
 	public Student(int id, String name, String gender, int grade) {
 		this.id = id;
 		this.name = name;
@@ -23,7 +21,12 @@ public class Student {
 		this.grade = grade;
 	}
 	
-	public Student(String url){
+	/**
+	 * Parse string as a HTTP URL params to create Student object
+	 * @param url
+	 * @throws IllegalArgumentException if the string dont not have a legal id number
+	 */
+	public Student(String url) throws IllegalArgumentException{
 		this(1);
 		int verifyID = -1;
 		String[] keys = url.split("&");
@@ -47,7 +50,7 @@ public class Student {
 	
 	@Override
 	public String toString() {
-		return "id:" + id + "\r\nname:" + name + "\r\ngender:" + gender + "\r\ngrade:" + grade;
+		return "id:" + id + "<br/>name:" + name + "<br/>gender:" + gender + "<br/>grade:" + grade;
 	}
 	public String toURLString(){
 		return "id=" + id + "&name=" + name + "&gender=" + gender + "&grade=" + grade;

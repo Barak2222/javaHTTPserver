@@ -16,32 +16,30 @@ import java.util.*;
 public class DataHandler {
 	static final int MAX_ENTRIES = 1000;
 	private Map<Integer, Student> m;
-	private File backup;
+	private File backupFile;
 	private FileInputStream in;
 	protected Queue<Thread> backupQueue;
 	private Timer timer;
-	private AutoBackup autoBackup;
+	private ScheduledBackup backup;
 
-	// {TOCHECK} why after reading the file deletes itself?
 	public DataHandler() {
-		m = new HashMap<>();
-
-		backup = new File("/Users/Barak/workspace/studentsHttpServer/src/studentsHttpServer/backup.txt");
-		try {
-			in = new FileInputStream(backup);
-			loadFromBackup();
-			in.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+		m = new HashMap<>();	
+		String path = DataHandler.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		backupFile = new File(path + "/../src/studentsHttpServer/backup.txt");
+		loadFromBackup();
 		timer = new Timer();
-		autoBackup = new AutoBackup(m, backup);
-		timer.schedule(autoBackup, 0, 1000);
-		saveToBackup();
+		backup = new ScheduledBackup(m, backupFile);
+		backup.run();
+		
+		// Than backup every one second
+		timer.schedule(backup, 0, 1000);
 	}
-
-	// {TODO} handle duplicates?
+	
+	/**
+	 * Add a student to the collection
+	 * @param s Student
+	 * @return true if the student was successfully added
+	 */
 	public boolean add(Student s) {
 		if (m.size() >= MAX_ENTRIES) {
 			return false;
@@ -51,53 +49,57 @@ public class DataHandler {
 		return true;
 	}
 
+	/**
+	 * Removes a student from the collection
+	 * @param id Student's id number
+	 */
 	public void remove(Integer id) {
 		if (m.remove(id) != null) {
 			saveToBackup();
 		}
 	}
 
+	/**
+	 * Find a student using an id number
+	 * @param id Studen't id number
+	 * @return The student, or null if a student wasn't found
+	 */
 	public Student get(int id) {
 		return m.get(id);
 	}
 
-	public void reset() {
-		m = new HashMap<>();
-
-		// Delete backup
-		try {
-			PrintWriter writer = new PrintWriter(backup);
-			writer.print("");
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public void saveToBackup() {
-		autoBackup.notifyChanged();
+		backup.notifyChanged();
 	}
 
 	private boolean checkifBackupIsEmpty() throws IOException {
-		return backup.length() < 10;
+		return backupFile.length() < 10;
 	}
 
-	public void loadFromBackup() {
+	/**
+	 * Load data from the backup file to memory
+	 */
+	private void loadFromBackup() {
 		Properties properties = new Properties();
-
 		try {
+			in = new FileInputStream(backupFile);
 			if (checkifBackupIsEmpty()) {
-				return;
+				return ;
 			}
 			properties.load(in);
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try{
+				in.close();
+			} catch(IOException e){
+				e.printStackTrace();
+			}
 		}
 
 		for (String key : properties.stringPropertyNames()) {
 			Student s = new Student(properties.get(key).toString());
 			m.put(s.getId(), s);
 		}
-		System.out.println("After reading rom backup, size: " + m.size());
 	}
 }

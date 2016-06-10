@@ -9,77 +9,37 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class backupRunner {
-	private int count;
+public class BackupRunner implements Runnable{
 	private FileOutputStream out;
 	private Map<Integer, Student> m;
 	private File backup;
-	private boolean lock1 = false;
-	private boolean lock2 = false;
-	private Lock lock = new ReentrantLock();
 
-	public backupRunner(Map<Integer, Student> m, File backup) {
+	public BackupRunner(Map<Integer, Student> m, File backup) {
 		this.m = m;
 		this.backup = backup;
-		try {
-			out = new FileOutputStream(backup);
-		} catch (IOException e) {
-			e.printStackTrace();//do something if needed...
-		}
-		count = 0;
 	}
-
-	public int getVacantThread() {
-		if (lock1 && lock2) {
-			return -1;
-		}
-		if(lock1){
-			lock2 = true;
-			return 2;
-		}
-		lock1 = true;
-		return 1;
+	public void run(){
+		saveData();
 	}
-
-	public boolean isEmpty() {
-		return !lock1 && !lock2;
-	}
-
-	public void wait1() {
-
-
-		lock.lock();
-		try {
-			save();
-		} finally {
-			lock.unlock();
-		}
-		lock1 = false;
-	}
-
-	public void wait2() {
-
-
-		lock.lock();
-		try {
-			save();
-		} finally {
-			lock.unlock();
-		}
-		lock2 = false;
-	}
-
-	private void save() {
-		System.out.println("executed2");
+	/**
+	 * Save the current data in MAP to the backup file
+	 */
+	private synchronized void saveData(){
 		Properties properties = new Properties();
 		for (Map.Entry<Integer, Student> entry : m.entrySet()) {
 			properties.put(Integer.toString(entry.getKey()), entry.getValue().toURLString());
 		}
 		try {
+			out = new FileOutputStream(backup);
 			properties.store(out, null);
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
-
 }
