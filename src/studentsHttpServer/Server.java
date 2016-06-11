@@ -32,7 +32,7 @@ public class Server extends Thread {
 			StringTokenizer tokenizer = new StringTokenizer(headerLine);
 			String httpMethod = tokenizer.nextToken();
 			String httpQueryString = tokenizer.nextToken();
-
+			
 			if (!httpMethod.equals("GET")){
 				sendResponse(404, RESP_NOTFOUND);
 				return ;
@@ -134,13 +134,17 @@ public class Server extends Thread {
 	}
 
 	static DataHandler data;
-	public static void main(String[] args) throws Exception {
-		ServerSocket Server = new ServerSocket(0);
-		System.out.println("Server is listenning on port " + Server.getLocalPort());
-		data = new DataHandler();
-		while (true) {
-			Socket connection = Server.accept();
-			new Server(connection).start();
+	public static void main(String[] args) {
+		try{
+			ServerSocket Server = new ServerSocket(0);
+			System.out.println("Server is listenning on port " + Server.getLocalPort());
+			data = new DataHandler();
+			while (true) {
+				Socket connection = Server.accept();
+				new Server(connection).start();
+			}
+		} catch(IOException e){
+			//do nothing
 		}
 	}
 
