@@ -5,15 +5,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class BackupRunner implements Runnable{
 	private FileOutputStream out;
 	private Map<Integer, Student> m;
-	private File backupFile;
+	private File backup;
 
-	public BackupRunner(Map<Integer, Student> m, File backupFile) {
+	public BackupRunner(Map<Integer, Student> m, File backup) {
 		this.m = m;
-		this.backupFile = backupFile;
+		this.backup = backup;
 	}
 	public void run(){
 		saveData();
@@ -27,7 +30,7 @@ public class BackupRunner implements Runnable{
 			properties.put(Integer.toString(entry.getKey()), entry.getValue().toURLString());
 		}
 		try {
-			out = new FileOutputStream(backupFile);
+			out = new FileOutputStream(backup);
 			properties.store(out, null);
 		} catch (IOException e) {
 			e.printStackTrace();
