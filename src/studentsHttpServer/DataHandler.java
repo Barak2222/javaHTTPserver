@@ -18,7 +18,6 @@ public class DataHandler {
 	private Map<Integer, Student> m;
 	private File backupFile;
 	private FileInputStream in;
-	protected Queue<Thread> backupQueue;
 	private Timer timer;
 	private ScheduledBackup backup;
 
@@ -82,10 +81,10 @@ public class DataHandler {
 	private void loadFromBackup() {
 		Properties properties = new Properties();
 		try {
-			in = new FileInputStream(backupFile);
 			if (checkifBackupIsEmpty()) {
 				return ;
 			}
+			in = new FileInputStream(backupFile);
 			properties.load(in);
 		} catch (IOException e) {
 			e.printStackTrace();
