@@ -28,7 +28,11 @@ public class Server extends Thread {
 		try {
 			inFromClient = new BufferedReader(new InputStreamReader(connectedClient.getInputStream()));
 			outToClient = new DataOutputStream(connectedClient.getOutputStream());
-			String headerLine = inFromClient.readLine();;
+			String headerLine = inFromClient.readLine();
+			if(headerLine == null || headerLine.length() < 1){
+				closeConnection();
+				return ;
+			}
 			StringTokenizer tokenizer = new StringTokenizer(headerLine);
 			String httpMethod = tokenizer.nextToken();
 			String httpQueryString = tokenizer.nextToken();
