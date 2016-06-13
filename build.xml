@@ -5,10 +5,7 @@
     <property name="build.dir"   value="build"/>
     <property name="classes.dir" value="${build.dir}/classes"/>
     <property name="jar.dir"     value="${build.dir}/jar"/>
-
     <property name="main-class"  value="studentsHttpServer.Server"/>
-
-
 
     <target name="clean">
         <delete dir="${build.dir}"/>
@@ -16,7 +13,7 @@
 
     <target name="compile">
         <mkdir dir="${classes.dir}"/>
-        <javac srcdir="${src.dir}" destdir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false"/>
     </target>
 
     <target name="jar" depends="compile">
@@ -29,11 +26,10 @@
     </target>
 
     <target name="run" depends="jar">
-        <java jar="${jar.dir}/${ant.project.name}.jar" fork="true"/>
+        <java jar="${jar.dir}/${ant.project.name}.jar" fork="true">
+        </java>
     </target>
 
     <target name="clean-build" depends="clean,jar"/>
-
     <target name="main" depends="clean,run"/>
-
 </project>
