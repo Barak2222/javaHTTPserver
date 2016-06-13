@@ -13,23 +13,35 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.*;
 
+/**
+ * This class contains all the logic for the responding to add/remove/find
+ * request, The requests are handled using HashMap on memory. In addition, this
+ * class contains the logic to support scheduled backups performed by other
+ * classes.
+ * 
+ * @author Barak
+ *
+ */
 public class DataHandler {
 	static final int MAX_ENTRIES = 1000;
 	static final String CURRENT_PATH = DataHandler.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-	
+
 	private Map<Integer, Student> m;
 	private File backupFile;
 	private FileInputStream in;
 	private Timer timer;
 	private ScheduledBackup backup;
-	
+
+	/**
+	 * Load the data to memory, and set up the needed logic for upcoming backups
+	 */
 	public DataHandler() {
 		m = new HashMap<>();
-		
+
 		// Path used when executed from eclipse
 		backupFile = new File(CURRENT_PATH + "/../backup.txt");
 		if (!backupFile.canRead()) {
-			
+
 			// Path used when executed using Apache Ant
 			backupFile = new File(CURRENT_PATH + "/../../../backup.txt");
 		}
@@ -81,10 +93,18 @@ public class DataHandler {
 		return m.get(id);
 	}
 
+	/**
+	 * Inform that the data on memory was changed, and a a backup is needed
+	 */
 	public void saveToBackup() {
 		backup.notifyChanged();
 	}
 
+	/**
+	 * 
+	 * @return True if backup is empty
+	 * @throws IOException
+	 */
 	private boolean checkifBackupIsEmpty() throws IOException {
 		return backupFile.length() < 10;
 	}

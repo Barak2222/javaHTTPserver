@@ -1,5 +1,10 @@
 package studentsHttpServer;
 
+/**
+ * Define a class for Student
+ * @author Barak
+ *
+ */
 public class Student {
 	static final String DEF = "DEFAULT_VALUE";
 	private int id;
